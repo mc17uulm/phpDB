@@ -1,0 +1,19 @@
+{
+    "name": "mc17uulm/php-database",
+    "description": "Simple PHP library for easy to use PDO-Mysql-Connection handling",
+    "authors": [
+        {
+            "name": "mc17uulm",
+            "email": "marco.combosch@uni-ulm.de"
+        }
+    ],
+    "require": {
+        "php": "^7.2",
+        "vlucas/phpdotenv": "^3.3"
+    },
+    "autoload": {
+        "psr-4": {
+            "PHPDatabase\\": "."
+        }
+    }
+}
