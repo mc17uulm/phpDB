@@ -21,7 +21,7 @@ class Database
     {
         self::load(
             Config::get("DATABASE_HOST"),
-            Config::get("DATABASE_PORT"),
+            intval(Config::get("DATABASE_PORT")),
             Config::get("DATABASE_NAME"),
             Config::get("DATABASE_USER"),
             Config::get("DATABASE_PASSWORD"),
