@@ -13,17 +13,19 @@ use Dotenv\Dotenv;
 class Config
 {
 
+    private static $env;
+
     public static function load(string $dir = __DIR__)
     {
 
         $dotenv = Dotenv::create($dir);
-        $dotenv->load();
+        self::$env = $dotenv->load();
 
     }
 
     public static function get(string $key) : string
     {
-        return $_ENV[$key] ?? "";
+        return self::$env[$key] ?? "";
     }
 
 }
