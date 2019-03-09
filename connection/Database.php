@@ -34,9 +34,7 @@ class Database
         try
         {
 
-            $dsn = "mysql:host=$host:$port;dbname=$db_name;charset=utf8";
-            var_dump($dsn);
-            self::$db = new PDO($dsn, $user, $password);
+            self::$db = new PDO("mysql:host=$host:$port;dbname=$db_name;charset=utf8", $user, $password);
 
             if($dev)
             {
