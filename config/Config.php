@@ -13,10 +13,10 @@ use Dotenv\Dotenv;
 class Config
 {
 
-    public static function load()
+    public static function load(string $dir = __DIR__)
     {
 
-        $dotenv = Dotenv::create(__DIR__ . "/../");
+        $dotenv = Dotenv::create($dir);
         $dotenv->load();
 
     }
