@@ -48,6 +48,11 @@ class Database
         }
     }
 
+    public static function is_loaded() : bool
+    {
+        return self::$db !== -1;
+    }
+
     public static function select(string $query, array $values = array(), bool $return_all = true)
     {
 
