@@ -53,42 +53,64 @@ class Database
         return self::$db !== -1;
     }
 
-    public static function select(string $query, array $values = array(), bool $return_all = true)
+    public static function select(string $query, array $values = array(), int $type = 0)
     {
 
-        return self::execute($query, $values, function($q, $e) use ($return_all) {
+        return self::execute($query, $values, function($q, $e) use ($type) {
 
             if($q->rowCount() > 0)
             {
-                return $return_all ? $q->fetchAll(PDO::FETCH_ASSOC) : $q->fetch(PDO::FETCH_ASSOC);
+                switch($type)
+                {
+                    case ReturnType::SET:
+                    case ReturnType::SINGLE:
+                        return new Result(true, $q->fetch(PDO::FETCH_ASSOC));
+                    case ReturnType::ALL:
+                        return new Result(true, $q->fetchAll(PDO::FETCH_ASSOC));
+                    case ReturnType::ID:
+                        return new Result(false, "SELECT query not supporting ID");
+                    default:
+                        return new Result(false);
+                }
             }
             else
             {
-                return array();
+                return new Result(true, array());
             }
 
-        });
+        }, $type);
 
     }
 
-    public static function update(string $query, array $values = array(), bool $get_result = false)
+    public static function update(string $query, array $values = array(), int $type = 0)
     {
-        return self::execute($query, $values, function ($q, $e) use ($get_result) {
-                return $e;
-        });
+        return self::execute($query, $values, function ($q, $e) use ($type) {
+
+            switch($type)
+            {
+                case ReturnType::SET:
+                case ReturnType::SINGLE:
+                case ReturnType::ALL:
+                    return new Result(true);
+                case ReturnType::ID:
+                    return new Result(true, $e);
+                default:
+                    return new Result(false);
+            }
+        }, $type);
     }
 
-    public static function insert(string $query, array $values = array(), bool $get_result = false)
+    public static function insert(string $query, array $values = array(), int $type = 0)
     {
-        return self::update($query, $values, $get_result);
+        return self::update($query, $values, $type);
     }
 
-    public static function delete(string $query, array $values = array(), bool $get_result = false)
+    public static function delete(string $query, array $values = array(), int $type = 0)
     {
-        return self::update($query, $values, $get_result);
+        return self::update($query, $values, $type);
     }
 
-    public static function execute(string $query, array $values = array(), callable $func = null)
+    public static function execute(string $query, array $values = array(), callable $func = null, int $type = 0)
     {
 
         self::check_db();
@@ -98,12 +120,16 @@ class Database
             $q = self::$db->prepare($query);
             $e = $q->execute($values);
 
+            if($type === ReturnType::ID) {
+                $e = self::$db->lastInsertId();
+            }
+
             return $func === null ? $e : call_user_func_array($func, array($q, $e));
 
         }
         catch(PDOException $e)
         {
-            throw new DatabaseException("PDOException: " . $e->getMessage());
+            return new Result(false, $e->getMessage());
         }
 
     }
