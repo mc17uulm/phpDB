@@ -8,12 +8,13 @@
         }
     ],
     "require": {
-        "php": "^7.2",
-        "vlucas/phpdotenv": "^3.3"
+        "php": "^7.4",
+        "ext-pdo": "*",
+        "myclabs/php-enum": "^1.7"
     },
     "autoload": {
         "psr-4": {
-            "PHPDatabase\\": "."
+            "phpDB\\": "./src/"
         }
     }
 }
