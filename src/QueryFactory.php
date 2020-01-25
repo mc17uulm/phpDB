@@ -134,7 +134,7 @@ class QueryFactory
         $data = [];
         foreach($set as $k => $v)
         {
-            $set_arg .= "$k = :$k";
+            $set_arg .= "$k = :$k, ";
             $data[":$k"] = $v;
         }
 

@@ -55,4 +55,20 @@ final class SelectQueryTest extends TestCase
         $this->assertEquals([":id" => 2], $query->get_data());
     }
 
+    public function testInvalidOrder() : void
+    {
+        $this->expectException(\phpDB\QueryException::class);
+        $factory = new QueryFactory();
+        $factory->select()->order("")->from("");
+        $query = $factory->create();
+    }
+
+    public function testInvalidArguments() : void
+    {
+        $this->expectException(\phpDB\QueryException::class);
+        $factory = new QueryFactory();
+        $factory->select()->insert();
+        $query = $factory->create();
+    }
+
 }
