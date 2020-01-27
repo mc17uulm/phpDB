@@ -2,8 +2,6 @@
 
 namespace phpDB;
 
-use phpDB\result\ResultSet;
-
 class QueryFactory
 {
 

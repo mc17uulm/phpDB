@@ -2,11 +2,6 @@
 
 namespace phpDB;
 
-use phpDB\result\ResultArraySet;
-use phpDB\result\ResultIntSet;
-use phpDB\result\ResultSet;
-use phpDB\result\ResultStringSet;
-
 class Connection
 {
 
@@ -32,7 +27,7 @@ class Connection
     public static function execute(Query $query) : ResultSet
     {
         if(!self::is_initialized()) {
-            return new ResultStringSet(false, "Connection not initialized");
+            return new ResultSet(false, "Connection not initialized");
         }
 
         try {
@@ -46,19 +41,19 @@ class Connection
                         return new ResultSet(false);
                     }
                     $data = $object->fetchAll(\PDO::FETCH_ASSOC);
-                    return new ResultArraySet(true, $data);
+                    return new ResultSet(true, $data);
                 case QueryType::UPDATE():
                 case QueryType::DELETE():
                     return new ResultSet(true);
                 case QueryType::INSERT():
                     $id = self::$connection->lastInsertId();
-                    return new ResultIntSet(true, $id);
+                    return new ResultSet(true, $id);
                 default:
-                    return new ResultStringSet(false, "Invalid type");
+                    return new ResultSet(false, "Invalid type");
             }
 
         } catch(\PDOException $e) {
-            return new ResultStringSet(false, $e->getMessage());
+            return new ResultSet(false, $e->getMessage());
         }
     }
 
