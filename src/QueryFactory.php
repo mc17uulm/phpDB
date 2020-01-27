@@ -2,21 +2,65 @@
 
 namespace phpDB;
 
+/**
+ * Class QueryFactory
+ * @package phpDB
+ *
+ * This class is used to create SQL queries and execute them with the static connection class
+ */
 class QueryFactory
 {
 
+    /**
+     * @var QueryType
+     */
     private QueryType $type;
+    /**
+     * @var array
+     */
     private array $selection;
+    /**
+     * @var string
+     */
     private string $table;
+    /**
+     * @var string|null
+     */
     private ?string $where_arg = null;
+    /**
+     * @var string|null
+     */
     private ?string $order_arg = null;
+    /**
+     * @var int|null
+     */
     private ?int $limit_arg = null;
+    /**
+     * @var string|null
+     */
     private ?string $column_arg = null;
+    /**
+     * @var string
+     */
     private string $value_arg;
+    /**
+     * @var string
+     */
     private string $set_arg;
+    /**
+     * @var array
+     */
     private array $data = [];
+    /**
+     * @var array
+     */
     private array $validation = [0,0,0,0,0,0,0,0,0,0,0];
 
+    /**
+     * @param array $arg
+     * @return QueryFactory
+     * @throws QueryException
+     */
     public function select(array $arg = []) : QueryFactory
     {
         $this->set_valid(0);
@@ -24,12 +68,21 @@ class QueryFactory
         return $this->set_type(QueryType::SELECT());
     }
 
+    /**
+     * @return QueryFactory
+     * @throws QueryException
+     */
     public function insert() : QueryFactory
     {
         $this->set_valid(1);
         return $this->set_type(QueryType::INSERT());
     }
 
+    /**
+     * @param string $table
+     * @return QueryFactory
+     * @throws QueryException
+     */
     public function update(string $table) : QueryFactory
     {
         $this->set_valid(2);
@@ -37,12 +90,21 @@ class QueryFactory
         return $this->set_type(QueryType::UPDATE());
     }
 
+    /**
+     * @return QueryFactory
+     * @throws QueryException
+     */
     public function delete() : QueryFactory
     {
         $this->set_valid(3);
         return $this->set_type(QueryType::DELETE());
     }
 
+    /**
+     * @param string $table
+     * @return QueryFactory
+     * @throws QueryException
+     */
     public function from(string $table) : QueryFactory
     {
         $this->set_valid(4);
@@ -50,6 +112,11 @@ class QueryFactory
         return $this;
     }
 
+    /**
+     * @param string $table
+     * @return QueryFactory
+     * @throws QueryException
+     */
     public function into(string $table) : QueryFactory
     {
         $this->set_valid(5);
@@ -57,6 +124,12 @@ class QueryFactory
         return $this;
     }
 
+    /**
+     * @param string $arg
+     * @param array $data
+     * @return QueryFactory
+     * @throws QueryException
+     */
     public function where(string $arg, array $data = []) : QueryFactory
     {
         switch($this->type)
@@ -73,6 +146,11 @@ class QueryFactory
         }
     }
 
+    /**
+     * @param string $arg
+     * @return QueryFactory
+     * @throws QueryException
+     */
     public function order(string $arg) : QueryFactory
     {
         if(!QueryType::SELECT()->equals($this->type)) {
@@ -83,6 +161,11 @@ class QueryFactory
         return $this;
     }
 
+    /**
+     * @param int $limit
+     * @return QueryFactory
+     * @throws QueryException
+     */
     public function limit(int $limit) : QueryFactory
     {
         if(!QueryType::SELECT()->equals($this->type)) {
@@ -93,6 +176,11 @@ class QueryFactory
         return $this;
     }
 
+    /**
+     * @param array $set
+     * @return QueryFactory
+     * @throws QueryException
+     */
     public function values(array $set) : QueryFactory
     {
         if(!QueryType::INSERT()->equals($this->type)) { throw new QueryException("Invalid method call. 'VALUES' cannot be executed by type '" . $this->type . "'"); }
@@ -123,6 +211,11 @@ class QueryFactory
         return $this;
     }
 
+    /**
+     * @param array $set
+     * @return QueryFactory
+     * @throws QueryException
+     */
     public function set(array $set) : QueryFactory
     {
         if(!QueryType::UPDATE()->equals($this->type)) { throw new QueryException("Invalid method call. 'SET' cannot be executed by type '" . $this->type . "'"); }
@@ -142,6 +235,10 @@ class QueryFactory
         return $this;
     }
 
+    /**
+     * @return Query
+     * @throws QueryException
+     */
     public function create() : Query
     {
         if(empty($this->type) || empty($this->table)) { throw new QueryException("QueryFactory not build"); }
@@ -160,12 +257,21 @@ class QueryFactory
         }
     }
 
+    /**
+     * @param Query|null $query
+     * @return ResultSet
+     * @throws QueryException
+     */
     public function execute(Query $query = null) : ResultSet
     {
         $query  = is_null($query) ? $this->create() : $query;
         return Connection::execute($query);
     }
 
+    /**
+     * @param int $index
+     * @throws QueryException
+     */
     private function set_valid(int $index) : void
     {
         if($index > count($this->validation) - 1) {
@@ -174,12 +280,20 @@ class QueryFactory
         $this->validation[$index] = 1;
     }
 
+    /**
+     * @param QueryType $type
+     * @return QueryFactory
+     */
     private function set_type(QueryType $type) : QueryFactory
     {
         $this->type = $type;
         return $this;
     }
 
+    /**
+     * @return Query
+     * @throws QueryException
+     */
     private function create_select() : Query
     {
         $valid_arr = [1,0,0,0,1,0,-1,-1,-1,0,0];
@@ -209,6 +323,10 @@ class QueryFactory
         return new Query($query, $this->data, $this->type);
     }
 
+    /**
+     * @return Query
+     * @throws QueryException
+     */
     private function create_insert() : Query
     {
         $valid_arr = [0,1,0,0,0,1,0,0,0,-1,0];
@@ -224,6 +342,10 @@ class QueryFactory
         return new Query($query, $this->data, $this->type);
     }
 
+    /**
+     * @return Query
+     * @throws QueryException
+     */
     private function create_update() : Query
     {
         $valid_arr = [0,0,1,0,0,0,1,0,0,0,1];
@@ -237,6 +359,10 @@ class QueryFactory
         return new Query($query, $this->data, $this->type);
     }
 
+    /**
+     * @return Query
+     * @throws QueryException
+     */
     private function create_delete() : Query
     {
         $valid_arr = [0,0,0,1,1,0,1,0,0,0,0];
@@ -249,6 +375,10 @@ class QueryFactory
         return new Query($query, $this->data, $this->type);
     }
 
+    /**
+     * @param array $bits
+     * @return bool
+     */
     private function validate(array $bits) : bool
     {
         for($i = 0; $i < count($this->validation); $i++)
@@ -262,12 +392,22 @@ class QueryFactory
         return true;
     }
 
+    /**
+     * @param string $query
+     * @param array $data
+     * @param QueryType $type
+     * @return ResultSet
+     * @throws QueryException
+     */
     public function raw_sql_execution(string $query, array $data, QueryType $type) : ResultSet
     {
         $raw_query = new Query($query, $data, $type);
         return $this->execute($raw_query);
     }
 
+    /**
+     * @return QueryFactory
+     */
     public function reset() : QueryFactory
     {
         $this->selection = [];

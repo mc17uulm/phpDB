@@ -1,9 +1,9 @@
 {
-    "name": "mc17uulm/php-database",
-    "description": "Simple PHP library for easy to use PDO-Mysql-Connection handling",
+    "name": "mc17/phpdb",
+    "description": "Simple PHP library for easy to use PDO-Mysql-Connection query creation and result handling",
     "authors": [
         {
-            "name": "mc17uulm",
+            "name": "mc17",
             "email": "marco.combosch@uni-ulm.de"
         }
     ],

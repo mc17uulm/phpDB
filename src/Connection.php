@@ -2,28 +2,50 @@
 
 namespace phpDB;
 
+use \PDO;
+use \PDOException;
+
+/**
+ * Class Connection
+ * @package phpDB
+ */
 class Connection
 {
 
-    private static ?\PDO $connection = null;
+    /**
+     * @var PDO|null
+     */
+    private static ?PDO $connection = null;
 
+    /**
+     * @param string $host
+     * @param int $port
+     * @param string $database
+     * @param string $user
+     * @param string $password
+     * @throws DatabaseException
+     */
     public static function initialize(string $host, int $port, string $database, string $user, string $password) : void
     {
         try {
-            self::$connection = new \PDO(
+            self::$connection = new PDO(
                 "mysql:host=$host:$port;dbname=$database;charset=utf8",
                 $user,
                 $password
             );
 
             if(defined(PHP_DB_DEV) && PHP_DB_DEV) {
-                self::$connection->setAttribute(\PDO::ATTR_ERRMODE, \PDO::ERRMODE_WARNING);
+                self::$connection->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_WARNING);
             }
-        } catch (\PDOException $e) {
+        } catch (PDOException $e) {
             throw new DatabaseException($e->getMessage());
         }
     }
 
+    /**
+     * @param Query $query
+     * @return ResultSet
+     */
     public static function execute(Query $query) : ResultSet
     {
         if(!self::is_initialized()) {
@@ -57,6 +79,9 @@ class Connection
         }
     }
 
+    /**
+     * @return bool
+     */
     private static function is_initialized() : bool
     {
         return !is_null(self::$connection);
