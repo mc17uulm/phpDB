@@ -55,7 +55,11 @@ class Connection
 
         try {
             $object = self::$connection->prepare($query->get_query());
-            $object->execute($query->get_data());
+            $success = $object->execute($query->get_data());
+
+            if(!$success) {
+                return $rs->set_error(implode(",", $object->errorInfo()));
+            }
 
             switch($query->get_type())
             {
