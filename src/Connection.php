@@ -60,9 +60,9 @@ class Connection
             switch($query->get_type())
             {
                 case QueryType::SELECT():
-                    if($object->rowCount() <= 0) {
+                    /**if($object->rowCount() <= 0) {
                         return $rs->set_error("No result");
-                    }
+                    }*/
                     $data = $object->fetchAll(\PDO::FETCH_ASSOC);
                     return $rs->set_success(array_map(fn(array $el) => new Result($el), $data));
                 case QueryType::UPDATE():

@@ -1,5 +1,7 @@
 # phpDB
 
+Version 0.2
+
 ### Usage
 
 #### Initialize Connection
