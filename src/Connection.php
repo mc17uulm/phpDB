@@ -48,8 +48,9 @@ class Connection
      */
     public static function execute(Query $query) : ResultSet
     {
+        $rs = new ResultSet();
         if(!self::is_initialized()) {
-            return new ResultSet(false, "Connection not initialized");
+            return $rs->set_error("Connection not initialized");
         }
 
         try {
@@ -60,22 +61,22 @@ class Connection
             {
                 case QueryType::SELECT():
                     if($object->rowCount() <= 0) {
-                        return new ResultSet(false);
+                        return $rs->set_error("No result");
                     }
                     $data = $object->fetchAll(\PDO::FETCH_ASSOC);
-                    return new ResultSet(true, $data);
+                    return $rs->set_success(array_map(fn(array $el) => new Result($el), $data));
                 case QueryType::UPDATE():
                 case QueryType::DELETE():
-                    return new ResultSet(true);
+                    return $rs->set_success();
                 case QueryType::INSERT():
                     $id = self::$connection->lastInsertId();
-                    return new ResultSet(true, $id);
+                    return $rs->set_success(new Result(["id" => $id]));
                 default:
-                    return new ResultSet(false, "Invalid type");
+                    return $rs->set_error("Invalid type");
             }
 
         } catch(\PDOException $e) {
-            return new ResultSet(false, $e->getMessage());
+            return $rs->set_error($e->getMessage());
         }
     }
 
@@ -85,6 +86,11 @@ class Connection
     private static function is_initialized() : bool
     {
         return !is_null(self::$connection);
+    }
+
+    public static function close() : void
+    {
+        self::$connection = null;
     }
 
 }

@@ -57,13 +57,21 @@ class QueryFactory
     private array $validation = [0,0,0,0,0,0,0,0,0,0,0];
 
     /**
-     * @param array $arg
+     * @param array | string $arg
      * @return QueryFactory
      * @throws QueryException
      */
-    public function select(array $arg = []) : QueryFactory
+    public function select($arg = []) : QueryFactory
     {
         $this->set_valid(0);
+        if(!is_array($arg)) {
+            if(is_string($arg) && ($arg === "*")) {
+                $arg = ["*"];
+            } else {
+                throw new QueryException("Invalid arguments: " . $arg);
+            }
+        }
+
         $this->selection = $arg;
         return $this->set_type(QueryType::SELECT());
     }
@@ -410,14 +418,7 @@ class QueryFactory
      */
     public function reset() : QueryFactory
     {
-        $this->selection = [];
-        $this->where_arg = null;
-        $this->order_arg = null;
-        $this->limit_arg = null;
-        $this->column_arg = null;
-        $this->data = [];
-        $this->validation = [0,0,0,0,0,0,0,0,0,0,0];
-        return $this;
+        return new QueryFactory();
     }
 
 }
