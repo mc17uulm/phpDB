@@ -238,7 +238,7 @@ class QueryFactory
         }
 
         $this->set_arg = substr($set_arg, 0, strlen($set_arg) - 2) . ")";
-        array_push($this->data, $data);
+        $this->data = array_merge($this->data, $data);
         $this->set_valid(10);
         return $this;
     }
