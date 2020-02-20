@@ -229,7 +229,7 @@ class QueryFactory
         if(!QueryType::UPDATE()->equals($this->type)) { throw new QueryException("Invalid method call. 'SET' cannot be executed by type '" . $this->type . "'"); }
         if(count($set) <= 0 || is_numeric(array_key_first($set))) { throw new QueryException("Invalid values"); }
 
-        $set_arg = "(";
+        $set_arg = "";
         $data = [];
         foreach($set as $k => $v)
         {
@@ -237,7 +237,7 @@ class QueryFactory
             $data[":$k"] = $v;
         }
 
-        $this->set_arg = substr($set_arg, 0, strlen($set_arg) - 2) . ")";
+        $this->set_arg = substr($set_arg, 0, strlen($set_arg) - 2);
         $this->data = array_merge($this->data, $data);
         $this->set_valid(10);
         return $this;
