@@ -42,21 +42,45 @@ class Database
         }
     }
 
+    /**
+     * @param string $query
+     * @param mixed ...$data
+     * @return ResultSet
+     * @throws DatabaseException
+     */
     public static function select(string $query, ...$data) : ResultSet
     {
         return self::execute($query, QueryType::SELECT(), $data);
     }
 
+    /**
+     * @param string $query
+     * @param mixed ...$data
+     * @return ResultSet
+     * @throws DatabaseException
+     */
     public static function insert(string $query, ...$data) : ResultSet
     {
         return self::execute($query, QueryType::INSERT(), $data);
     }
 
+    /**
+     * @param string $query
+     * @param mixed ...$data
+     * @return ResultSet
+     * @throws DatabaseException
+     */
     public static function update(string $query, ...$data) : ResultSet
     {
         return self::execute($query, QueryType::UPDATE(), $data);
     }
 
+    /**
+     * @param string $query
+     * @param mixed ...$data
+     * @return ResultSet
+     * @throws DatabaseException
+     */
     public static function delete(string $query, ...$data) : ResultSet
     {
         return self::execute($query, QueryType::DELETE(), $data);
@@ -67,12 +91,13 @@ class Database
      * @param QueryType $type
      * @param array $data
      * @return ResultSet
+     * @throws DatabaseException
      */
     public static function execute(string $query, QueryType $type, $data) : ResultSet
     {
         $rs = new ResultSet();
         if(!self::is_initialized()) {
-            return $rs->set_error("Connection not initialized");
+            throw new DatabaseException("Connection not initialized");
         }
 
         try {
@@ -80,15 +105,12 @@ class Database
             $success = $object->execute($data);
 
             if(!$success) {
-                return $rs->set_error(implode(",", $object->errorInfo()));
+                throw new DatabaseException(implode(",", $object->errorInfo()));
             }
 
             switch($type)
             {
                 case QueryType::SELECT():
-                    /**if($object->rowCount() <= 0) {
-                        return $rs->set_error("No result");
-                    }*/
                     $data = $object->fetchAll(\PDO::FETCH_ASSOC);
                     return $rs->set_success($data);
                 case QueryType::UPDATE():
@@ -98,11 +120,11 @@ class Database
                     $id = self::$connection->lastInsertId();
                     return $rs->set_success(["id" => $id]);
                 default:
-                    return $rs->set_error("Invalid type");
+                    throw new DatabaseException("Invalid type");
             }
 
         } catch(\PDOException $e) {
-            return $rs->set_error($e->getMessage());
+            throw new DatabaseException($e->getMessage());
         }
     }
 
