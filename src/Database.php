@@ -9,7 +9,7 @@ use \PDOException;
  * Class Connection
  * @package phpDB
  */
-class Connection
+class Database
 {
 
     /**
@@ -42,11 +42,33 @@ class Connection
         }
     }
 
+    public static function select(string $query, ...$data) : ResultSet
+    {
+        return self::execute($query, QueryType::SELECT(), $data);
+    }
+
+    public static function insert(string $query, ...$data) : ResultSet
+    {
+        return self::execute($query, QueryType::INSERT(), $data);
+    }
+
+    public static function update(string $query, ...$data) : ResultSet
+    {
+        return self::execute($query, QueryType::UPDATE(), $data);
+    }
+
+    public static function delete(string $query, ...$data) : ResultSet
+    {
+        return self::execute($query, QueryType::DELETE(), $data);
+    }
+
     /**
-     * @param Query $query
+     * @param string $query
+     * @param QueryType $type
+     * @param array $data
      * @return ResultSet
      */
-    public static function execute(Query $query) : ResultSet
+    public static function execute(string $query, QueryType $type, $data) : ResultSet
     {
         $rs = new ResultSet();
         if(!self::is_initialized()) {
@@ -54,27 +76,27 @@ class Connection
         }
 
         try {
-            $object = self::$connection->prepare($query->get_query());
-            $success = $object->execute($query->get_data());
+            $object = self::$connection->prepare($query);
+            $success = $object->execute($data);
 
             if(!$success) {
                 return $rs->set_error(implode(",", $object->errorInfo()));
             }
 
-            switch($query->get_type())
+            switch($type)
             {
                 case QueryType::SELECT():
                     /**if($object->rowCount() <= 0) {
                         return $rs->set_error("No result");
                     }*/
                     $data = $object->fetchAll(\PDO::FETCH_ASSOC);
-                    return $rs->set_success(array_map(fn(array $el) => new Result($el), $data));
+                    return $rs->set_success($data);
                 case QueryType::UPDATE():
                 case QueryType::DELETE():
                     return $rs->set_success();
                 case QueryType::INSERT():
                     $id = self::$connection->lastInsertId();
-                    return $rs->set_success(new Result(["id" => $id]));
+                    return $rs->set_success(["id" => $id]);
                 default:
                     return $rs->set_error("Invalid type");
             }

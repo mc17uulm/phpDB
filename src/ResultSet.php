@@ -15,7 +15,7 @@ class ResultSet
     private bool $success;
 
     /**
-     * @var array<Result>
+     * @var array
      */
     private array $results;
 
@@ -35,14 +35,11 @@ class ResultSet
     }
 
     /**
-     * @param array<Result> | Result $results
+     * @param array
      * @return ResultSet
      */
-    public function set_success($results = []) : ResultSet {
+    public function set_success(array $results = []) : ResultSet {
         $this->success = true;
-        if(!is_array($results)) {
-            $results = [$results];
-        }
         $this->results = $results;
         $this->err_msg = "";
         return $this;
@@ -75,10 +72,10 @@ class ResultSet
 
     /**
      * @param int $id
-     * @return Result
+     * @return mixed
      * @throws QueryException
      */
-    public function get_result(int $id) : Result
+    public function get_result(int $id)
     {
         if(!$this->success) throw new QueryException("Execution error: no result");
         if(($id >= 0) && isset($this->results[$id])) {
@@ -88,10 +85,10 @@ class ResultSet
     }
 
     /**
-     * @return array|Result|string
+     * @return array
      * @throws QueryException
      */
-    public function get_first_result() : Result
+    public function get_first_result() : array
     {
         return $this->get_result(0);
     }
