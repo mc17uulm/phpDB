@@ -1,6 +1,6 @@
 # phpDB
 
-Version 1.0.1
+Version 1.0.2
 
 ### Usage
 
@@ -10,11 +10,11 @@ Version 1.0.1
 
 ````php
 
-use phpDB\Connection;
+use phpDB\Database;
 use phpDB\DatabaseException;
 
 try {
-    Connection::initialize(
+    Database::initialize(
         "localhost",
         3306,
         "database",
