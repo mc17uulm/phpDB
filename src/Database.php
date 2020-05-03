@@ -25,7 +25,7 @@ class Database
      * @param string $password
      * @throws DatabaseException
      */
-    public static function initialize(string $host, int $port, string $database, string $user, string $password, bool $encrypted) : void
+    public static function initialize(string $host, int $port, string $database, string $user, string $password) : void
     {
         try {
             self::$connection = new PDO(
