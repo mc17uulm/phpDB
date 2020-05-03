@@ -101,4 +101,12 @@ class ResultSet
         return $this->success ? "no error" : $this->err_msg;
     }
 
+    /**
+     * @return int
+     */
+    public function get_size() : int
+    {
+        return count($this->results);
+    }
+
 }
