@@ -15,9 +15,9 @@ class ResultSet
     private bool $success;
 
     /**
-     * @var array
+     * @var Collection
      */
-    private array $results;
+    private Collection $results;
 
     /**
      * @var string
@@ -25,18 +25,12 @@ class ResultSet
     private string $err_msg;
 
     /**
-     * @var bool
-     */
-    private bool $collection;
-
-    /**
      * ResultSet constructor.
-     * @param bool $collection
      */
-    public function __construct(bool $collection = true)
+    public function __construct()
     {
         $this->success = false;
-        $this->results = [];
+        $this->results = new Collection();
         $this->err_msg = "not initialized";
     }
 
@@ -46,14 +40,14 @@ class ResultSet
      */
     public function set_success(array $results = []) : ResultSet {
         $this->success = true;
-        $this->results = $results;
+        $this->results = new Collection($results);
         $this->err_msg = "";
         return $this;
     }
 
     public function set_error(string $msg) : ResultSet {
         $this->success = false;
-        $this->results = [];
+        $this->results = new Collection();
         $this->err_msg = $msg;
         return $this;
     }
@@ -67,36 +61,34 @@ class ResultSet
     }
 
     /**
-     * @return array | Collection
+     * @return Collection
      * @throws QueryException
      */
-    public function get_results() : iterable
+    public function get_results() : Collection
     {
         if(!$this->success) throw new QueryException("Execution error: no result");
-        return $this->collection ? new Collection($this->results) : $this->results;
+        return $this->results;
     }
 
     /**
      * @param int $id
      * @return mixed
      * @throws QueryException
+     * @throws CollectionException
      */
     public function get_result(int $id)
     {
         if(!$this->success) throw new QueryException("Execution error: no result");
-        if(($id >= 0) && isset($this->results[$id])) {
-            return $this->results[$id];
-        }
-        throw new QueryException("Invalid key: " . $id);
+        return $this->results->get($id);
     }
 
     /**
-     * @return array | Collection
-     * @throws QueryException
+     * @return Collection
+     * @throws CollectionException
      */
-    public function get_first_result() : iterable
+    public function get_first_result() : Collection
     {
-        return $this->collection ? new Collection($this->get_result(0)) : $this->get_result(0);
+        return new Collection($this->results->get(0));
     }
 
     /**
@@ -112,7 +104,7 @@ class ResultSet
      */
     public function get_size() : int
     {
-        return count($this->results);
+        return $this->results->length();
     }
 
 }
