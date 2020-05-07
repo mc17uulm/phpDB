@@ -40,7 +40,7 @@ class ResultSet
      */
     public function set_success(array $results = []) : ResultSet {
         $this->success = true;
-        $this->results = new Collection($results);
+        $this->results = (new Collection($results))->map(fn(array $el) => new Collection($el));
         $this->err_msg = "";
         return $this;
     }
