@@ -25,9 +25,15 @@ class ResultSet
     private string $err_msg;
 
     /**
-     * ResultSet constructor.
+     * @var bool
      */
-    public function __construct()
+    private bool $collection;
+
+    /**
+     * ResultSet constructor.
+     * @param bool $collection
+     */
+    public function __construct(bool $collection = true)
     {
         $this->success = false;
         $this->results = [];
@@ -61,13 +67,13 @@ class ResultSet
     }
 
     /**
-     * @return array
+     * @return array | Collection
      * @throws QueryException
      */
-    public function get_results() : array
+    public function get_results() : iterable
     {
         if(!$this->success) throw new QueryException("Execution error: no result");
-        return $this->results;
+        return $this->collection ? new Collection($this->results) : $this->results;
     }
 
     /**
@@ -85,12 +91,12 @@ class ResultSet
     }
 
     /**
-     * @return array
+     * @return array | Collection
      * @throws QueryException
      */
-    public function get_first_result() : array
+    public function get_first_result() : iterable
     {
-        return $this->get_result(0);
+        return $this->collection ? new Collection($this->get_result(0)) : $this->get_result(0);
     }
 
     /**
