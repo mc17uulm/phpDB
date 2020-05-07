@@ -88,7 +88,7 @@ class ResultSet
      */
     public function get_first_result() : Collection
     {
-        return new Collection($this->results->get(0));
+        return $this->results->get(0);
     }
 
     /**
