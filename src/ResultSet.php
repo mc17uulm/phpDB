@@ -40,7 +40,7 @@ class ResultSet
      */
     public function set_success(array $results = []) : ResultSet {
         $this->success = true;
-        $this->results = (new Collection($results))->map(fn(array $el) => new Collection($el));
+        $this->results = (new Collection($results))->map(fn($el) => is_array($el) ? new Collection($el) : $el);
         $this->err_msg = "";
         return $this;
     }
@@ -72,7 +72,7 @@ class ResultSet
 
     /**
      * @param int $id
-     * @return mixed
+     * @return Collection | mixed
      * @throws QueryException
      * @throws CollectionException
      */

@@ -173,4 +173,9 @@ class Collection
         return $this->search($callable, true);
     }
 
+    public function walk(callable $callable) : void
+    {
+
+    }
+
 }
