@@ -173,6 +173,15 @@ class Collection
         return $this->search($callable, true);
     }
 
+    /**
+     * @param Collection $collection
+     * @return Collection
+     */
+    public function merge(Collection $collection) : Collection
+    {
+        return new Collection(array_merge($this->list, $collection->to_array()));
+    }
+
     public function walk(callable $callable) : void
     {
 
