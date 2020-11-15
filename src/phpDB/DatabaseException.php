@@ -2,9 +2,11 @@
 
 namespace phpDB;
 
+use Exception;
+
 /**
  * Class DatabaseException
  * @package phpDB
  */
 
-class DatabaseException extends \Exception {};
+class DatabaseException extends Exception {};

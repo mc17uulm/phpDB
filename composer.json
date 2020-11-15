@@ -8,17 +8,12 @@
         }
     ],
     "require": {
-        "php": "^7.4",
-        "ext-pdo": "*",
-        "myclabs/php-enum": "^1.7"
+        "php": "^7.4"
     },
     "autoload": {
         "psr-4": {
-            "phpDB\\": "./src/"
+            "phpDB\\": "src/phpDB/"
         }
-    },
-    "require-dev": {
-        "phpunit/phpunit": "^8"
     },
     "scripts": {
         "test": "./vendor/bin/phpunit --bootstrap vendor/autoload.php tests/"

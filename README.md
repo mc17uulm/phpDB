@@ -1,12 +1,12 @@
 # phpDB
 
-Version 1.0.3
+Version 1.0.4
 
 ### Usage
 
 #### Initialize Connection
 
-``Database::initialize(string host, int port, string db_name, string username, string password)``
+``Database::connect(string host, int port, string db_name, string username, string password, bool debug = false)``
 
 ````php
 
@@ -14,13 +14,20 @@ use phpDB\Database;
 use phpDB\DatabaseException;
 
 try {
-    Database::initialize(
+
+    Database::connect(
         "localhost",
         3306,
         "database",
         "username",
-        "password"
+        "password",
+        true
      );
+
+    // Do stuff with Database
+    
+    Database::close();
+
 } catch (DatabaseException $e) {
     echo $e->getMessage();
 }
@@ -35,24 +42,24 @@ try {
 */
 
 use phpDB\Database;
-use phpDB\QueryException;
+use phpDB\DatabaseException;
 
 try {
-    $rs = Database::select("SELECT * FROM users WHERE id = ? LIMIT 1", 1);
+    // select() returns array with fetched columns
+    $result = Database::select("SELECT * FROM users WHERE id = ? LIMIT 1", 1);
     
-    if($rs->was_success()) {
-        echo $rs->get_first_result()["username"];
+    
+    if(count($result) === 0) {
+        echo "No dataset found";
     } else {
-        echo "Failure: " . $rs->get_error_msg();
+        echo $result[0]["username"];
     }
-} catch(QueryException $e) {
+} catch(DatabaseException $e) {
     echo $e->getMessage();
 }
 ````
 
 #### Close connection
-
-The connection is automatically closed after your script is executed. To close ist manually:
 
 ````php
 
