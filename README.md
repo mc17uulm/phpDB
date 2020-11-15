@@ -38,7 +38,7 @@ try {
 ````php
 
 /** 
- * Connection already initialized with Connection::initialize()
+ * Database already initialized with Database::connect()
 */
 
 use phpDB\Database;
