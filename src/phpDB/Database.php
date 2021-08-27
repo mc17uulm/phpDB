@@ -36,6 +36,7 @@ class Database
      * @param string $database
      * @param string $user
      * @param string $password
+     * @param bool $debug
      * @throws DatabaseException
      */
     public static function connect(string $host, int $port, string $database, string $user, string $password, bool $debug = false) : void
@@ -108,13 +109,29 @@ class Database
     }
 
     /**
+     * @param mixed $var
+     * @return int
+     * @throws DatabaseException
+     */
+    private static function get_type(mixed $var) : int {
+        $type = gettype($var);
+        return match ($type) {
+            'integer', 'double' => PDO::PARAM_INT,
+            'string' => PDO::PARAM_STR,
+            'boolean' => PDO::PARAM_BOOL,
+            'NULL' => PDO::PARAM_NULL,
+            default => throw new DatabaseException("Invalid type '$type"),
+        };
+    }
+
+    /**
      * @param string $query
      * @param string $type
      * @param array $data
      * @return array|int|bool
      * @throws DatabaseException
      */
-    private static function execute(string $query, string $type, array $data)
+    private static function execute(string $query, string $type, array $data): int|bool|array
     {
 
         if(!self::is_connected()) {
@@ -124,17 +141,20 @@ class Database
         try {
             $statement = self::$connection->prepare($query);
 
-            if(!$statement->execute($data)) {
+            array_walk($data, function(mixed $var, int $i) use($statement) {
+                $statement->bindValue($i + 1, $var, self::get_type($var));
+            });
+
+            if(!$statement->execute()) {
                 throw new DatabaseException(implode(";", $statement->errorInfo()));
             }
 
-            switch($type) {
-                case "SELECT": return $statement->fetchAll(PDO::FETCH_ASSOC);
-                case "UPDATE":
-                case "DELETE": return true;
-                case "INSERT": return intval(self::$connection->lastInsertId());
-                default: throw new DatabaseException("Invalid query type '$type'");
-            }
+            return match ($type) {
+                "SELECT" => $statement->fetchAll(PDO::FETCH_ASSOC),
+                "UPDATE", "DELETE" => true,
+                "INSERT" => intval(self::$connection->lastInsertId()),
+                default => throw new DatabaseException("Invalid query type '$type'"),
+            };
 
         } catch(PDOException $e) {
             throw new DatabaseException($e->getMessage());
