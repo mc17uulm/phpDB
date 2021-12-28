@@ -48,6 +48,9 @@ class Database
                 $password
             );
 
+            self::$connection->setAttribute(PDO::ATTR_EMULATE_PREPARES, false);
+            self::$connection->setAttribute(PDO::ATTR_STRINGIFY_FETCHES, false);
+
             if($debug) {
                 self::$connection->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
             }
